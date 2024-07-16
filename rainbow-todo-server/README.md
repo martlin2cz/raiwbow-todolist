@@ -15,4 +15,12 @@ Start (trivial):
 
     java -jar target/rainbow-todolist-*.jar
 
+Build docker image:
+
+    sudo docker build -t martlin2cz/rainbowtodolist-server .
+
+Start docker image:
+
+    sudo docker run -p 8080:8080 martlin2cz/rainbowtodolist-server
+
 
