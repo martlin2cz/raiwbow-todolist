@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>cz.martlin</groupId>
-	<artifactId>rainbow-todolist</artifactId>
+	<artifactId>rainbow-todolist-server-spring</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<name>Rainbow Todolist</name>
 	<description>Yet another TODO list, but this one with colors</description>
