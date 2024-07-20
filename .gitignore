@@ -1,3 +1,4 @@
+# MAVEN
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -10,6 +11,7 @@ buildNumber.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
 
+# ECLIPSE
 # Eclipse m2e generated files
 # Eclipse Core
 .project
@@ -17,3 +19,16 @@ buildNumber.properties
 .classpath
 # the eclipse settings
 .settings/
+
+# PYTHON
+.venv/
+*.pyc
+__pycache__/
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+build/
+
+
