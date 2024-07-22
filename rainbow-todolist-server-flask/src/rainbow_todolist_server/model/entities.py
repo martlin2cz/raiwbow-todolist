@@ -1,8 +1,9 @@
+import uuid
 from dataclasses import dataclass
 
 
 @dataclass()
 class RainbowTask:
-    id: int
+    id: uuid
     text: str
 
