@@ -36,14 +36,62 @@
         },
         columns: [
             {
-                data: 'text'
+                data: 'text',
+                render: function (data, type) {
+                    if (type != 'display') {
+                        return data;
+                    }
+
+                    return '<form method="PATCH" class="rainbow-task-text-edit-form">'
+                            + '<input type="text" name="text" value="' + data + '" class="rainbow-task-text-edit-input">'
+                            + '</form>';
+
+                }
             }
         ],
+        createdRow: function (row, data, index) {
+            var id = data["id"]
+            $(row).find("form.rainbow-task-text-edit-form").submit(function(event) {
+                submitUpdatedTextForm(event, id);
+            });
+            $(row).find(".rainbow-task-text-edit-input").change(function(event) {
+                submitUpdatedText(event, id);
+            });
+        },
         info: false,
         ordering: false,
         paging: false,
         searching: false
-       })
+       });
+
+    function submitUpdatedTextForm(event, id) {
+        var form = event.target
+        var text = form["text"].value
+
+        doSaveUpdatedText(id, text);
+
+        event.preventDefault();
+    }
+
+    function submitUpdatedText(event, id) {
+        var text = event.target.value
+
+        doSaveUpdatedText(id, text);
+
+        event.preventDefault();
+    }
+
+    function doSaveUpdatedText(id, text) {
+        if (text) {
+            executeAjax("PATCH", "tasks/" + id, {"text": text});
+        } else {
+            executeAjax("DELETE", "tasks/" + id, {});
+        }
+    }
+
+    function executeAjax(method, relativeURI, data) {
+        console.log(method, relativeURI, data);
+    }
 </script>
 </body>
 </html>
