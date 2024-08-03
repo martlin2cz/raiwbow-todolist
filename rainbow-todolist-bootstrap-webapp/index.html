@@ -90,7 +90,18 @@
     }
 
     function executeAjax(method, relativeURI, data) {
-        console.log(method, relativeURI, data);
+        var uri = "http://localhost:" + PORT + "/api/v0.2/rainbowtodolist/" + relativeURI;
+        console.debug(method, uri, data);
+
+        $.ajax({
+          type: method,
+          url: uri,
+          data: data,
+          dataType: "json",
+          encode: true,
+        }).done(function (data) {
+            alert("Done!");
+        });
     }
 </script>
 </body>
