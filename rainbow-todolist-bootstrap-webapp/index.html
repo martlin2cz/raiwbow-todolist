@@ -12,6 +12,18 @@
 </head>
 <body>
 <h1>Rainbow todolist</h1>
+<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="rainbow-todolist-status-toast">
+  <div class="toast-header">
+    <strong class="mr-auto">Saved</strong>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+    Done?
+  </div>
+</div>
+
 <table id="rainbow-tasks-table">
     <thead>
     <tr>
@@ -28,7 +40,7 @@
     // var data = {"result": [{"id":"f164ae90-1ef0-4803-a28c-1b4f6a590b63","text":"Try the app"}]}
     const PORT = 5000
 
-    new DataTable("#rainbow-tasks-table", {
+    var rainbowTasksDatatable = new DataTable("#rainbow-tasks-table", {
 
         ajax: {
             dataSrc: 'result',
@@ -100,7 +112,11 @@
           dataType: "json",
           encode: true,
         }).done(function (data) {
-            alert("Done!");
+            rainbowTasksDatatable.ajax.reload();
+            $("#rainbow-todolist-status-toast").toast("show");
+        }).fail(function (data) {
+            rainbowTasksDatatable.ajax.reload();
+            $("#rainbow-todolist-status-toast").toast("show");
         });
     }
 </script>
