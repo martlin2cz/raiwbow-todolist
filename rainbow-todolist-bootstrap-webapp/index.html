@@ -12,17 +12,13 @@
 </head>
 <body>
 <h1>Rainbow todolist</h1>
-<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="rainbow-todolist-status-toast">
-  <div class="toast-header">
-    <strong class="mr-auto">Saved</strong>
-    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+  <div style="position: absolute; top: 10pt; right: 10pt; min-height: 200pt">
+    <div class="toast text-white" role="alert" aria-live="assertive" aria-atomic="true" id="rainbow-todolist-status-toast">
+      <div class="toast-body" id="the-toast-body">
+        Done?
+      </div>
+    </div>
   </div>
-  <div class="toast-body">
-    Done?
-  </div>
-</div>
 
 <table id="rainbow-tasks-table">
     <thead>
@@ -67,7 +63,7 @@
                 submitUpdatedTextForm(event, id);
             });
             $(row).find(".rainbow-task-text-edit-input").change(function(event) {
-                submitUpdatedText(event, id);
+                submitWholeFormOfInput(event, id);
             });
         },
         info: false,
@@ -76,6 +72,14 @@
         searching: false
        });
 
+    function submitWholeFormOfInput(event, id) {
+        var input = event.target
+        var form = input.form
+
+        $(form).trigger('submit')
+
+        event.preventDefault();
+    }
     function submitUpdatedTextForm(event, id) {
         var form = event.target
         var text = form["text"].value
@@ -85,13 +89,6 @@
         event.preventDefault();
     }
 
-    function submitUpdatedText(event, id) {
-        var text = event.target.value
-
-        doSaveUpdatedText(id, text);
-
-        event.preventDefault();
-    }
 
     function doSaveUpdatedText(id, text) {
         if (text) {
@@ -112,12 +109,27 @@
           dataType: "json",
           encode: true,
         }).done(function (data) {
-            rainbowTasksDatatable.ajax.reload();
-            $("#rainbow-todolist-status-toast").toast("show");
+            var text = "Saved!";
+            processResult(true, text);
         }).fail(function (data) {
-            rainbowTasksDatatable.ajax.reload();
-            $("#rainbow-todolist-status-toast").toast("show");
+            var text = "<strong>Failed:</strong> <pre>" + JSON.stringify(data) + "</pre>";
+            processResult(false, text);
         });
+    }
+
+    function processResult(success, text) {
+        rainbowTasksDatatable.ajax.reload();
+
+        if (success) {
+            $("#rainbow-todolist-status-toast").removeClass("bg-danger")
+            $("#rainbow-todolist-status-toast").addClass("bg-success")
+        } else {
+            $("#rainbow-todolist-status-toast").removeClass("bg-success")
+            $("#rainbow-todolist-status-toast").addClass("bg-danger")
+        }
+
+        $("#the-toast-body").html(text)
+        $("#rainbow-todolist-status-toast").toast("show");
     }
 </script>
 </body>
