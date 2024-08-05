@@ -26,6 +26,7 @@
         <th>Task text</th>
     </tr>
     </thead>
+
      <tfoot>
         <tr>
             <th>
@@ -34,7 +35,6 @@
                 </form>
             </th>
         </tr>
-
      </tfoot>
 </table>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
@@ -61,27 +61,29 @@
                     }
 
                     return '<form method="PATCH" class="rainbow-task-text-edit-form rainbow-task-inline-form">'
-                            + '<input type="text" name="text" value="' + data + '" class="rainbow-task-text-edit-input">'
+                            + '<input type="text" name="text" value="' + data + '" class="rainbow-task-text-input">'
                             + '</form>';
 
                 }
             }
         ],
         createdRow: function (row, data, index) {
+            // register on change/on submit events for the row text input and form
             var id = data["id"]
             $(row).find("form.rainbow-task-text-edit-form").submit(function(event) {
                 submitUpdatedTextForm(event, id);
             });
             $(row).find(".rainbow-task-text-input").change(function(event) {
-                submitWholeFormOfInput(event, id);
+                submitWholeFormOfInput(event);
             });
         },
         initComplete: function(settings, data) {
+            // register on change/on submit events for the "add new" footer input and form
             $("form.rainbow-task-add-form").submit(function(event) {
                 submitAddNewTaskForm(event);
             });
-            $("form.rainbow-task-add-form .rainbow-task-text-edit-input").change(function(event) {
-                submitWholeFormOfInput(event);
+            $(".rainbow-task-text-input").change(function(event) {
+               submitWholeFormOfInput(event);
             });
         },
         info: false,
@@ -92,7 +94,7 @@
 
 
 
-    function submitWholeFormOfInput(event, id) {
+    function submitWholeFormOfInput(event) {
         var input = event.target
         var form = input.form
 
