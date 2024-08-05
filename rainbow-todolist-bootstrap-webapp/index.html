@@ -26,6 +26,16 @@
         <th>Task text</th>
     </tr>
     </thead>
+     <tfoot>
+        <tr>
+            <th>
+                <form method="PUT" class="rainbow-task-add-form rainbow-task-inline-form">
+                    <input type="text" name="text" class="rainbow-task-text-input" placeholder="Add new task">
+                </form>
+            </th>
+        </tr>
+
+     </tfoot>
 </table>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
@@ -50,7 +60,7 @@
                         return data;
                     }
 
-                    return '<form method="PATCH" class="rainbow-task-text-edit-form">'
+                    return '<form method="PATCH" class="rainbow-task-text-edit-form rainbow-task-inline-form">'
                             + '<input type="text" name="text" value="' + data + '" class="rainbow-task-text-edit-input">'
                             + '</form>';
 
@@ -62,7 +72,7 @@
             $(row).find("form.rainbow-task-text-edit-form").submit(function(event) {
                 submitUpdatedTextForm(event, id);
             });
-            $(row).find(".rainbow-task-text-edit-input").change(function(event) {
+            $(row).find(".rainbow-task-text-input").change(function(event) {
                 submitWholeFormOfInput(event, id);
             });
         },
@@ -70,6 +80,13 @@
         ordering: false,
         paging: false,
         searching: false
+       });
+
+       $("form.rainbow-task-add-form").submit(function(event) {
+            submitAddNewTaskForm(event);
+       });
+       $("form.rainbow-task-add-form .rainbow-task-text-edit-input").change(function(event) {
+            submitWholeFormOfInput(event);
        });
 
     function submitWholeFormOfInput(event, id) {
@@ -89,12 +106,28 @@
         event.preventDefault();
     }
 
+    function submitAddNewTaskForm(event) {
+        var form = event.target
+        var text = form["text"].value
+
+        doCreateTaskText(text);
+
+        event.preventDefault();
+    }
+
 
     function doSaveUpdatedText(id, text) {
         if (text) {
             executeAjax("PATCH", "tasks/" + id, {"text": text});
         } else {
+            //TODO confirm
             executeAjax("DELETE", "tasks/" + id, {});
+        }
+    }
+
+    function doCreateTaskText(text) {
+        if (text) {
+            executeAjax("PUT", "tasks", {"text": text});
         }
     }
 
