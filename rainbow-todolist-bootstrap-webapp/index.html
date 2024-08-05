@@ -76,18 +76,21 @@
                 submitWholeFormOfInput(event, id);
             });
         },
+        initComplete: function(settings, data) {
+            $("form.rainbow-task-add-form").submit(function(event) {
+                submitAddNewTaskForm(event);
+            });
+            $("form.rainbow-task-add-form .rainbow-task-text-edit-input").change(function(event) {
+                submitWholeFormOfInput(event);
+            });
+        },
         info: false,
         ordering: false,
         paging: false,
         searching: false
        });
 
-       $("form.rainbow-task-add-form").submit(function(event) {
-            submitAddNewTaskForm(event);
-       });
-       $("form.rainbow-task-add-form .rainbow-task-text-edit-input").change(function(event) {
-            submitWholeFormOfInput(event);
-       });
+
 
     function submitWholeFormOfInput(event, id) {
         var input = event.target
@@ -108,9 +111,10 @@
 
     function submitAddNewTaskForm(event) {
         var form = event.target
-        var text = form["text"].value
+        var textInput = form["text"]
+        var text = textInput.value
 
-        doCreateTaskText(text);
+        doCreateTaskText(text, textInput);
 
         event.preventDefault();
     }
@@ -125,10 +129,12 @@
         }
     }
 
-    function doCreateTaskText(text) {
+    function doCreateTaskText(text, textInput) {
         if (text) {
             executeAjax("PUT", "tasks", {"text": text});
         }
+
+        textInput.value = ""
     }
 
     function executeAjax(method, relativeURI, data) {
