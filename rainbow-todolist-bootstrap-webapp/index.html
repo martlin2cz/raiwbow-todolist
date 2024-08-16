@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rainbow todolist</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/v/bs5/dt-2.1.2/datatables.min.css" rel="stylesheet">
+
+<!--    <script src="js/scripts.js"></script>-->
+</head>
+<body>
+<h1>Rainbow todolist</h1>
+  <div style="position: absolute; top: 10pt; right: 10pt; min-height: 200pt">
+    <div class="toast text-white" role="alert" aria-live="assertive" aria-atomic="true" id="rainbow-todolist-status-toast">
+      <div class="toast-body" id="the-toast-body">
+        Done?
+      </div>
+    </div>
+  </div>
+
+<table id="rainbow-tasks-table">
+    <thead>
+    <tr>
+        <th>Task text</th>
+    </tr>
+    </thead>
+
+     <tfoot>
+        <tr>
+            <th>
+                <form method="PUT" class="rainbow-task-add-form rainbow-task-inline-form">
+                    <input type="text" name="text" class="rainbow-task-text-input" placeholder="Add new task">
+                </form>
+            </th>
+        </tr>
+     </tfoot>
+</table>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.2/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.2/js/dataTables.bootstrap5.min.js"></script>
+<script type="module">
+
+    // var data = {"result": [{"id":"f164ae90-1ef0-4803-a28c-1b4f6a590b63","text":"Try the app"}]}
+    const PORT = 5000
+
+    var rainbowTasksDatatable = new DataTable("#rainbow-tasks-table", {
+
+        ajax: {
+            dataSrc: 'result',
+            url: "http://localhost:" + PORT + "/api/v0.2/rainbowtodolist/tasks"
+        },
+        columns: [
+            {
+                data: 'text',
+                render: function (data, type) {
+                    if (type != 'display') {
+                        return data;
+                    }
+
+                    return '<form method="PATCH" class="rainbow-task-text-edit-form rainbow-task-inline-form">'
+                            + '<input type="text" name="text" value="' + data + '" class="rainbow-task-text-input">'
+                            + '</form>';
+
+                }
+            }
+        ],
+        createdRow: function (row, data, index) {
+            // register on change/on submit events for the row text input and form
+            var id = data["id"]
+            $(row).find("form.rainbow-task-text-edit-form").submit(function(event) {
+                submitUpdatedTextForm(event, id);
+            });
+            $(row).find(".rainbow-task-text-input").change(function(event) {
+                submitWholeFormOfInput(event);
+            });
+        },
+        initComplete: function(settings, data) {
+            // register on change/on submit events for the "add new" footer input and form
+            $("form.rainbow-task-add-form").submit(function(event) {
+                submitAddNewTaskForm(event);
+            });
+            $(".rainbow-task-text-input").change(function(event) {
+               submitWholeFormOfInput(event);
+            });
+        },
+        info: false,
+        ordering: false,
+        paging: false,
+        searching: false
+       });
+
+
+
+    function submitWholeFormOfInput(event) {
+        var input = event.target
+        var form = input.form
+
+        $(form).trigger('submit')
+
+        event.preventDefault();
+    }
+    function submitUpdatedTextForm(event, id) {
+        var form = event.target
+        var text = form["text"].value
+
+        doSaveUpdatedText(id, text);
+
+        event.preventDefault();
+    }
+
+    function submitAddNewTaskForm(event) {
+        var form = event.target
+        var textInput = form["text"]
+        var text = textInput.value
+
+        doCreateTaskText(text, textInput);
+
+        event.preventDefault();
+    }
+
+
+    function doSaveUpdatedText(id, text) {
+        if (text) {
+            executeAjax("PATCH", "tasks/" + id, {"text": text});
+        } else {
+            //TODO confirm
+            executeAjax("DELETE", "tasks/" + id, {});
+        }
+    }
+
+    function doCreateTaskText(text, textInput) {
+        if (text) {
+            executeAjax("PUT", "tasks", {"text": text});
+        }
+
+        textInput.value = ""
+    }
+
+    function executeAjax(method, relativeURI, data) {
+        var uri = "http://localhost:" + PORT + "/api/v0.2/rainbowtodolist/" + relativeURI;
+        console.debug(method, uri, data);
+
+        $.ajax({
+          type: method,
+          url: uri,
+          data: data,
+          dataType: "json",
+          encode: true,
+        }).done(function (data) {
+            var text = "Saved!";
+            processResult(true, text);
+        }).fail(function (data) {
+            var text = "<strong>Failed:</strong> <pre>" + JSON.stringify(data) + "</pre>";
+            processResult(false, text);
+        });
+    }
+
+    function processResult(success, text) {
+        rainbowTasksDatatable.ajax.reload();
+
+        if (success) {
+            $("#rainbow-todolist-status-toast").removeClass("bg-danger")
+            $("#rainbow-todolist-status-toast").addClass("bg-success")
+        } else {
+            $("#rainbow-todolist-status-toast").removeClass("bg-success")
+            $("#rainbow-todolist-status-toast").addClass("bg-danger")
+        }
+
+        $("#the-toast-body").html(text)
+        $("#rainbow-todolist-status-toast").toast("show");
+    }
+</script>
+</body>
+</html>
